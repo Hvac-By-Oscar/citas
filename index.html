@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HVAC By Oscar – Solicitar Cita de Servicio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --card-bg: #1e293b;
+      --primary-blue: #2563eb;
+      --accent-cyan: #06b6d4;
+      --accent-orange: #f97316;
+      --text-white: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --success-green: #10b981;
+      --error-red: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background-color: var(--bg-dark); color: var(--text-white); display: flex; justify-content: center; min-height: 100vh; padding: 16px; }
+    .container { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 20px; padding-bottom: 40px; }
+    .header { text-align: center; padding: 20px 0; }
+    .logo-badge { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, rgba(37,99,235,0.2), rgba(6,182,212,0.2)); border: 1px solid var(--accent-cyan); padding: 8px 16px; border-radius: 30px; font-weight: 700; font-size: 14px; color: var(--accent-cyan); margin-bottom: 12px; }
+    .header h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+    .header p { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
+    .card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+    .section-title { font-size: 13px; font-weight: 700; color: var(--accent-cyan); text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+    input, select, textarea { width: 100%; background-color: #0f172a; border: 1px solid var(--border-color); border-radius: 10px; padding: 12px 14px; color: var(--text-white); font-size: 14px; outline: none; transition: border-color 0.2s; }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary-blue); }
+    .badge-auto { background: rgba(16,185,129,0.15); border: 1px solid var(--success-green); color: var(--success-green); padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; }
+    .grid-dates { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+    .date-btn { background-color: #0f172a; border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 6px; text-align: center; cursor: pointer; transition: all 0.2s; }
+    .date-btn.active { border-color: var(--primary-blue); background-color: var(--primary-blue); font-weight: 700; }
+    .date-btn .day { font-size: 11px; opacity: 0.8; }
+    .date-btn .date { font-size: 13px; font-weight: 700; margin-top: 2px; }
+    .service-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; }
+    .service-card { background-color: #0f172a; border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; gap: 4px; }
+    .service-card.active { border-color: var(--accent-orange); background: rgba(249,115,22,0.15); }
+    .service-card .icon { font-size: 18px; }
+    .service-card .title { font-size: 12px; font-weight: 700; }
+    .btn-submit { background: linear-gradient(135deg, var(--primary-blue), var(--accent-cyan)); color: white; border: none; border-radius: 12px; padding: 16px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(37,99,235,0.4); transition: transform 0.1s; }
+    .btn-submit:active { transform: scale(0.98); }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 100; }
+    .modal { background-color: var(--card-bg); border-radius: 20px; padding: 28px; max-width: 380px; text-align: center; display: flex; flex-direction: column; gap: 14px; }
+    .modal.success { border: 1px solid var(--success-green); }
+    .modal.error { border: 1px solid var(--error-red); }
+    .modal .big-icon { font-size: 48px; }
+    .status-msg { font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo-badge">❄️ HVAC BY OSCAR</div>
+      <h1>Solicitar Servicio de Aire</h1>
+      <p>Completa el formulario y tu cita llegará directo a Oscar</p>
+    </div>
+
+    <div class="card">
+      <div class="section-title">📍 Datos del Servicio</div>
+      <div id="autoBadge" class="badge-auto" style="display:none;">✨ Equipo detectado automáticamente por QR</div>
+      <div class="form-group">
+        <label>Dirección del Inmueble *</label>
+        <input type="text" id="addressInput" placeholder="Ej: 100 Brickell Ave, Miami FL" required>
+      </div>
+      <div class="form-group">
+        <label>Apto / Suite / Unidad</label>
+        <input type="text" id="aptInput" placeholder="Ej: Apt 4B">
+      </div>
+      <div class="form-group">
+        <label>Teléfono de Contacto *</label>
+        <input type="tel" id="phoneInput" placeholder="Ej: (305) 555-0199" required>
+      </div>
+      <div class="form-group">
+        <label>Nombre</label>
+        <input type="text" id="nameInput" placeholder="Ej: Juan Pérez">
+      </div>
+      <div class="form-group">
+        <label>Equipo / Marca</label>
+        <input type="text" id="equipmentInput" placeholder="Ej: Carrier 4-Ton" readonly>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">📅 ¿Cuándo lo Necesitas?</div>
+      <div class="grid-dates">
+        <div class="date-btn active" onclick="pickDate(this,'Hoy')"><div class="day">HOY</div><div class="date" id="d0">--</div></div>
+        <div class="date-btn" onclick="pickDate(this,'Mañana')"><div class="day">MAÑANA</div><div class="date" id="d1">--</div></div>
+        <div class="date-btn" onclick="pickDate(this,'Pasado Mañana')"><div class="day">PASADO</div><div class="date" id="d2">--</div></div>
+      </div>
+      <div class="form-group">
+        <label>Franja Horaria</label>
+        <select id="timeSlotInput">
+          <option value="Mañana (8AM-12PM)">Mañana (8AM - 12PM)</option>
+          <option value="Tarde (12PM-5PM)">Tarde (12PM - 5PM)</option>
+          <option value="Urgencia 24/7">🔥 Urgencia 24/7</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">🛠️ Tipo de Problema</div>
+      <div class="service-grid">
+        <div class="service-card active" onclick="pickSvc(this,'No Enfría / Falla')"><div class="icon">❄️</div><div class="title">No Enfría</div></div>
+        <div class="service-card" onclick="pickSvc(this,'Mantenimiento')"><div class="icon">🧹</div><div class="title">Mantenimiento</div></div>
+        <div class="service-card" onclick="pickSvc(this,'Recarga Freón')"><div class="icon">🧪</div><div class="title">Recarga</div></div>
+        <div class="service-card" onclick="pickSvc(this,'Capacitor/Eléctrico')"><div class="icon">⚡</div><div class="title">Eléctrico</div></div>
+      </div>
+      <div class="form-group">
+        <label>Descripción del Problema</label>
+        <textarea id="notesInput" rows="2" placeholder="Ej: Hace ruido y no enfría bien..."></textarea>
+      </div>
+    </div>
+
+    <button class="btn-submit" id="btnSubmit" onclick="sendBooking()">📲 Enviar Solicitud de Cita a Oscar</button>
+    <div class="status-msg" id="statusMsg"></div>
+  </div>
+
+  <!-- Success Modal -->
+  <div class="modal-overlay" id="successModal">
+    <div class="modal success">
+      <div class="big-icon">✅</div>
+      <h2>¡Solicitud Enviada!</h2>
+      <p>Tu cita ha sido transmitida directamente a la computadora de <strong>HVAC By Oscar</strong>. Te contactaremos pronto para confirmar.</p>
+      <button class="btn-submit" onclick="document.getElementById('successModal').style.display='none'">Entendido</button>
+    </div>
+  </div>
+
+  <!-- Error Modal -->
+  <div class="modal-overlay" id="errorModal">
+    <div class="modal error">
+      <div class="big-icon">⚠️</div>
+      <h2>Error de Conexión</h2>
+      <p id="errorMsg">No se pudo enviar la solicitud. Puedes llamar directamente al número que aparece en el sticker QR.</p>
+      <button class="btn-submit" onclick="document.getElementById('errorModal').style.display='none'">Cerrar</button>
+    </div>
+  </div>
+
+  <script>
+    let selDate = 'Hoy', selSvc = 'No Enfría / Falla';
+
+    // Read URL params (pre-filled from QR sticker)
+    const p = new URLSearchParams(location.search);
+    const binId = p.get('bin') || '';
+    if (p.get('name')) document.getElementById('nameInput').value = p.get('name');
+    if (p.get('address')) document.getElementById('addressInput').value = p.get('address');
+    if (p.get('phone')) document.getElementById('phoneInput').value = p.get('phone');
+    if (p.get('equipment')) {
+      document.getElementById('equipmentInput').value = p.get('equipment');
+      document.getElementById('autoBadge').style.display = 'block';
+    }
+
+    // Fill date buttons
+    for (let i = 0; i < 3; i++) {
+      const d = new Date(); d.setDate(d.getDate() + i);
+      document.getElementById('d' + i).innerText = d.getDate() + '/' + (d.getMonth() + 1);
+    }
+
+    function pickDate(el, txt) {
+      document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active'); selDate = txt;
+    }
+    function pickSvc(el, txt) {
+      document.querySelectorAll('.service-card').forEach(s => s.classList.remove('active'));
+      el.classList.add('active'); selSvc = txt;
+    }
+
+    async function sendBooking() {
+      const address = document.getElementById('addressInput').value.trim();
+      const phone = document.getElementById('phoneInput').value.trim();
+      if (!address || !phone) { alert('Dirección y Teléfono son requeridos.'); return; }
+      if (!binId) {
+        document.getElementById('errorMsg').textContent = 'Este QR no tiene un canal de transmisión configurado. Contacta a Oscar directamente.';
+        document.getElementById('errorModal').style.display = 'flex';
+        return;
+      }
+
+      const btn = document.getElementById('btnSubmit');
+      btn.innerText = '⏳ Enviando...'; btn.disabled = true;
+      document.getElementById('statusMsg').textContent = 'Conectando con el sistema de Oscar...';
+
+      const apt = document.getElementById('aptInput').value.trim();
+      const name = document.getElementById('nameInput').value.trim() || 'Cliente QR';
+      const equipment = document.getElementById('equipmentInput').value.trim();
+      const notes = document.getElementById('notesInput').value.trim();
+      const timeSlot = document.getElementById('timeSlotInput').value;
+      const fullAddr = apt ? address + ', ' + apt : address;
+
+      const newBooking = {
+        id: Date.now(),
+        name: name,
+        address: fullAddr,
+        phone: phone,
+        aptNumber: apt,
+        equipment: equipment,
+        problem: selSvc + (notes ? ' - ' + notes : ''),
+        requestedDate: selDate,
+        timeSlot: timeSlot,
+        timestamp: new Date().toISOString(),
+        isAccepted: false
+      };
+
+      try {
+        // Step 1: GET current cloud data
+        const endpoint = 'https://jsonblob.com/api/jsonBlob/' + binId;
+        const getResp = await fetch(endpoint, {
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (!getResp.ok) throw new Error('Server response: ' + getResp.status);
+        const cloudData = await getResp.json();
+
+        // Step 2: Append booking to qr_bookings array
+        if (!cloudData.qr_bookings) cloudData.qr_bookings = [];
+        cloudData.qr_bookings.push(newBooking);
+
+        // Step 3: PUT updated data back
+        const putResp = await fetch(endpoint, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify(cloudData)
+        });
+
+        if (!putResp.ok) throw new Error('PUT failed: ' + putResp.status);
+
+        // Success!
+        document.getElementById('statusMsg').textContent = '';
+        document.getElementById('successModal').style.display = 'flex';
+      } catch (err) {
+        console.error('Booking error:', err);
+        document.getElementById('errorMsg').textContent = 'Error: ' + err.message + '. Puedes llamar directamente al número del sticker.';
+        document.getElementById('errorModal').style.display = 'flex';
+        btn.innerText = '📲 Reintentar Envío'; btn.disabled = false;
+        document.getElementById('statusMsg').textContent = '';
+      }
+    }
+  </script>
+</body>
+</html>
