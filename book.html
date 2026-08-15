@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HVAC By Oscar – Solicitar Cita de Servicio</title>
+  <title>HVAC By Oscar – Book AC Service Appointment</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -20,12 +20,19 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
     body { background-color: var(--bg-dark); color: var(--text-white); display: flex; justify-content: center; min-height: 100vh; padding: 16px; }
-    .container { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 20px; padding-bottom: 40px; }
-    .header { text-align: center; padding: 20px 0; }
-    .logo-badge { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, rgba(37,99,235,0.2), rgba(6,182,212,0.2)); border: 1px solid var(--accent-cyan); padding: 8px 16px; border-radius: 30px; font-weight: 700; font-size: 14px; color: var(--accent-cyan); margin-bottom: 12px; }
+    .container { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 18px; padding-bottom: 40px; }
+    
+    /* Top Bar with Language Selector */
+    .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; }
+    .logo-badge { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, rgba(37,99,235,0.2), rgba(6,182,212,0.2)); border: 1px solid var(--accent-cyan); padding: 6px 14px; border-radius: 30px; font-weight: 700; font-size: 13px; color: var(--accent-cyan); }
+    .lang-switcher { display: flex; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px; padding: 3px; gap: 2px; }
+    .lang-btn { background: transparent; border: none; color: var(--text-muted); font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 16px; cursor: pointer; transition: all 0.2s; }
+    .lang-btn.active { background-color: var(--primary-blue); color: white; box-shadow: 0 2px 8px rgba(37,99,235,0.4); }
+
+    .header { text-align: center; padding: 10px 0; }
     .header h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
     .header p { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
-    .card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+    .card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
     .section-title { font-size: 13px; font-weight: 700; color: var(--accent-cyan); text-transform: uppercase; letter-spacing: 0.5px; }
     .form-group { display: flex; flex-direction: column; gap: 5px; }
     label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
@@ -55,69 +62,82 @@
 </head>
 <body>
   <div class="container">
-    <div class="header">
+    <!-- Top Bar: Logo & Bilingual Switcher -->
+    <div class="top-bar">
       <div class="logo-badge">❄️ HVAC BY OSCAR</div>
-      <h1>Solicitar Servicio de Aire</h1>
-      <p>Completa el formulario y tu cita llegará directo a Oscar</p>
-    </div>
-
-    <div class="card">
-      <div class="section-title">📍 Datos del Servicio</div>
-      <div id="autoBadge" class="badge-auto" style="display:none;">✨ Equipo detectado automáticamente por QR</div>
-      <div class="form-group">
-        <label>Dirección del Inmueble *</label>
-        <input type="text" id="addressInput" placeholder="Ej: 100 Brickell Ave, Miami FL" required>
-      </div>
-      <div class="form-group">
-        <label>Apto / Suite / Unidad</label>
-        <input type="text" id="aptInput" placeholder="Ej: Apt 4B">
-      </div>
-      <div class="form-group">
-        <label>Teléfono de Contacto *</label>
-        <input type="tel" id="phoneInput" placeholder="Ej: (305) 555-0199" required>
-      </div>
-      <div class="form-group">
-        <label>Nombre</label>
-        <input type="text" id="nameInput" placeholder="Ej: Juan Pérez">
-      </div>
-      <div class="form-group">
-        <label>Equipo / Marca</label>
-        <input type="text" id="equipmentInput" placeholder="Ej: Carrier 4-Ton" readonly>
+      <div class="lang-switcher">
+        <button class="lang-btn active" id="btnLangEn" onclick="setLanguage('en')">🇺🇸 EN</button>
+        <button class="lang-btn" id="btnLangEs" onclick="setLanguage('es')">🇪🇸 ES</button>
       </div>
     </div>
 
+    <!-- Header Section -->
+    <div class="header">
+      <h1 id="txtTitle">Request AC Service</h1>
+      <p id="txtSubtitle">Submit the form and your appointment will be dispatched directly to Oscar</p>
+    </div>
+
+    <!-- Customer & Address Card -->
     <div class="card">
-      <div class="section-title">📅 ¿Cuándo lo Necesitas?</div>
+      <div class="section-title" id="txtSecLocation">📍 Service Location</div>
+      <div id="autoBadge" class="badge-auto" style="display:none;">✨ Equipment detected automatically via QR sticker</div>
+      <div class="form-group">
+        <label id="lblAddress">Property Address *</label>
+        <input type="text" id="addressInput" placeholder="e.g. 100 Brickell Ave, Miami FL" required>
+      </div>
+      <div class="form-group">
+        <label id="lblApt">Apt / Suite / Unit</label>
+        <input type="text" id="aptInput" placeholder="e.g. Apt 4B">
+      </div>
+      <div class="form-group">
+        <label id="lblPhone">Contact Phone Number *</label>
+        <input type="tel" id="phoneInput" placeholder="e.g. (305) 555-0199" required>
+      </div>
+      <div class="form-group">
+        <label id="lblName">Your Name</label>
+        <input type="text" id="nameInput" placeholder="e.g. John Smith">
+      </div>
+      <div class="form-group">
+        <label id="lblEquipment">HVAC Brand / Unit</label>
+        <input type="text" id="equipmentInput" placeholder="e.g. Carrier 4-Ton Condenser" readonly>
+      </div>
+    </div>
+
+    <!-- Preferred Time Card -->
+    <div class="card">
+      <div class="section-title" id="txtSecWhen">📅 When Do You Need Service?</div>
       <div class="grid-dates">
-        <div class="date-btn active" onclick="pickDate(this,'Hoy')"><div class="day">HOY</div><div class="date" id="d0">--</div></div>
-        <div class="date-btn" onclick="pickDate(this,'Mañana')"><div class="day">MAÑANA</div><div class="date" id="d1">--</div></div>
-        <div class="date-btn" onclick="pickDate(this,'Pasado Mañana')"><div class="day">PASADO</div><div class="date" id="d2">--</div></div>
+        <div class="date-btn active" id="btnDate0" onclick="pickDate(0)"><div class="day" id="lblDay0">TODAY</div><div class="date" id="d0">--</div></div>
+        <div class="date-btn" id="btnDate1" onclick="pickDate(1)"><div class="day" id="lblDay1">TOMORROW</div><div class="date" id="d1">--</div></div>
+        <div class="date-btn" id="btnDate2" onclick="pickDate(2)"><div class="day" id="lblDay2">DAY AFTER</div><div class="date" id="d2">--</div></div>
       </div>
       <div class="form-group">
-        <label>Franja Horaria</label>
+        <label id="lblTimeSlot">Preferred Time Window</label>
         <select id="timeSlotInput">
-          <option value="Mañana (8AM-12PM)">Mañana (8AM - 12PM)</option>
-          <option value="Tarde (12PM-5PM)">Tarde (12PM - 5PM)</option>
-          <option value="Urgencia 24/7">🔥 Urgencia 24/7</option>
+          <option value="Morning (8AM - 12PM)" id="optSlotMorning">Morning (8:00 AM - 12:00 PM)</option>
+          <option value="Afternoon (12PM - 5PM)" id="optSlotAfternoon">Afternoon (12:00 PM - 5:00 PM)</option>
+          <option value="Emergency 24/7" id="optSlotEmergency">🔥 Emergency 24/7 Immediate Dispatch</option>
         </select>
       </div>
     </div>
 
+    <!-- Service Issue Card -->
     <div class="card">
-      <div class="section-title">🛠️ Tipo de Problema</div>
+      <div class="section-title" id="txtSecProblem">🛠️ Service Needed</div>
       <div class="service-grid">
-        <div class="service-card active" onclick="pickSvc(this,'No Enfría / Falla')"><div class="icon">❄️</div><div class="title">No Enfría</div></div>
-        <div class="service-card" onclick="pickSvc(this,'Mantenimiento')"><div class="icon">🧹</div><div class="title">Mantenimiento</div></div>
-        <div class="service-card" onclick="pickSvc(this,'Recarga Freón')"><div class="icon">🧪</div><div class="title">Recarga</div></div>
-        <div class="service-card" onclick="pickSvc(this,'Capacitor/Eléctrico')"><div class="icon">⚡</div><div class="title">Eléctrico</div></div>
+        <div class="service-card active" onclick="pickSvc(0)"><div class="icon">❄️</div><div class="title" id="svc0">Not Cooling</div></div>
+        <div class="service-card" onclick="pickSvc(1)"><div class="icon">🧹</div><div class="title" id="svc1">Maintenance</div></div>
+        <div class="service-card" onclick="pickSvc(2)"><div class="icon">🧪</div><div class="title" id="svc2">Freon Recharge</div></div>
+        <div class="service-card" onclick="pickSvc(3)"><div class="icon">⚡</div><div class="title" id="svc3">Electrical / Fan</div></div>
       </div>
       <div class="form-group">
-        <label>Descripción del Problema</label>
-        <textarea id="notesInput" rows="2" placeholder="Ej: Hace ruido y no enfría bien..."></textarea>
+        <label id="lblNotes">Describe What's Happening</label>
+        <textarea id="notesInput" rows="2" placeholder="e.g. Making unusual noise and not cooling..."></textarea>
       </div>
     </div>
 
-    <button class="btn-submit" id="btnSubmit" onclick="sendBooking()">📲 Enviar Solicitud de Cita a Oscar</button>
+    <!-- Submit Button -->
+    <button class="btn-submit" id="btnSubmit" onclick="sendBooking()">📲 Dispatch Appointment to Oscar</button>
     <div class="status-msg" id="statusMsg"></div>
   </div>
 
@@ -125,9 +145,9 @@
   <div class="modal-overlay" id="successModal">
     <div class="modal success">
       <div class="big-icon">✅</div>
-      <h2>¡Solicitud Enviada!</h2>
-      <p>Tu cita ha sido transmitida directamente a la computadora de <strong>HVAC By Oscar</strong>. Te contactaremos pronto para confirmar.</p>
-      <button class="btn-submit" onclick="document.getElementById('successModal').style.display='none'">Entendido</button>
+      <h2 id="txtSuccessTitle">Appointment Dispatched!</h2>
+      <p id="txtSuccessMsg">Your service request has been sent directly to <strong>HVAC By Oscar</strong>. We will contact you promptly to confirm your appointment.</p>
+      <button class="btn-submit" onclick="document.getElementById('successModal').style.display='none'" id="btnSuccessClose">Got It</button>
     </div>
   </div>
 
@@ -135,17 +155,158 @@
   <div class="modal-overlay" id="errorModal">
     <div class="modal error">
       <div class="big-icon">⚠️</div>
-      <h2>Error de Conexión</h2>
-      <p id="errorMsg">No se pudo enviar la solicitud. Puedes llamar directamente al número que aparece en el sticker QR.</p>
-      <button class="btn-submit" onclick="document.getElementById('errorModal').style.display='none'">Cerrar</button>
+      <h2 id="txtErrorTitle">Connection Notice</h2>
+      <p id="errorMsg">Could not transmit request. You can call directly to the phone number printed on the QR sticker.</p>
+      <button class="btn-submit" onclick="document.getElementById('errorModal').style.display='none'" id="btnErrorClose">Close</button>
     </div>
   </div>
 
   <script>
-    let selDate = 'Hoy', selSvc = 'No Enfría / Falla';
+    // Bilingual Dictionary
+    const i18n = {
+      en: {
+        pageTitle: "HVAC By Oscar – Book AC Service Appointment",
+        title: "Request AC Service",
+        subtitle: "Submit the form and your appointment will be dispatched directly to Oscar",
+        secLocation: "📍 Service Location",
+        autoBadge: "✨ Equipment detected automatically via QR sticker",
+        lblAddress: "Property Address *",
+        phAddress: "e.g. 100 Brickell Ave, Miami FL",
+        lblApt: "Apt / Suite / Unit",
+        phApt: "e.g. Apt 4B",
+        lblPhone: "Contact Phone Number *",
+        phPhone: "e.g. (305) 555-0199",
+        lblName: "Your Name",
+        phName: "e.g. John Smith",
+        lblEquipment: "HVAC Brand / Unit",
+        secWhen: "📅 When Do You Need Service?",
+        days: ["TODAY", "TOMORROW", "DAY AFTER"],
+        lblTimeSlot: "Preferred Time Window",
+        slots: [
+          "Morning (8:00 AM - 12:00 PM)",
+          "Afternoon (12:00 PM - 5:00 PM)",
+          "🔥 Emergency 24/7 Immediate Dispatch"
+        ],
+        secProblem: "🛠️ Service Needed",
+        services: ["Not Cooling / Fails", "Maintenance / Tune-Up", "Freon Recharge", "Electrical / Capacitor"],
+        lblNotes: "Describe What's Happening",
+        phNotes: "e.g. Making unusual noise and not cooling...",
+        btnSubmit: "📲 Dispatch Appointment to Oscar",
+        btnSending: "⏳ Dispatching to Oscar...",
+        statusConnecting: "Connecting with Oscar's dispatch system...",
+        valRequired: "Please enter your Address and Contact Phone Number.",
+        successTitle: "Appointment Dispatched!",
+        successMsg: "Your service request has been sent directly to <strong>HVAC By Oscar</strong>. We will contact you promptly to confirm your appointment.",
+        successClose: "Got It",
+        errorTitle: "Connection Notice",
+        errorClose: "Close"
+      },
+      es: {
+        pageTitle: "HVAC By Oscar – Solicitar Cita de Servicio",
+        title: "Solicitar Servicio de Aire",
+        subtitle: "Completa el formulario y tu cita llegará directo a Oscar",
+        secLocation: "📍 Datos del Servicio",
+        autoBadge: "✨ Equipo detectado automáticamente por sticker QR",
+        lblAddress: "Dirección del Inmueble *",
+        phAddress: "Ej: 100 Brickell Ave, Miami FL",
+        lblApt: "Apto / Suite / Unidad",
+        phApt: "Ej: Apt 4B",
+        lblPhone: "Teléfono de Contacto *",
+        phPhone: "Ej: (305) 555-0199",
+        lblName: "Tu Nombre",
+        phName: "Ej: Juan Pérez",
+        lblEquipment: "Equipo / Marca",
+        secWhen: "📅 ¿Cuándo lo Necesitas?",
+        days: ["HOY", "MAÑANA", "PASADO"],
+        lblTimeSlot: "Franja Horaria",
+        slots: [
+          "Mañana (8:00 AM - 12:00 PM)",
+          "Tarde (12:00 PM - 5:00 PM)",
+          "🔥 Urgencia 24/7 Inmediata"
+        ],
+        secProblem: "🛠️ Tipo de Problema",
+        services: ["No Enfría / Falla", "Mantenimiento Preventivo", "Recarga de Freón", "Capacitor / Eléctrico"],
+        lblNotes: "Descripción del Problema",
+        phNotes: "Ej: Hace ruido y no enfría bien...",
+        btnSubmit: "📲 Enviar Solicitud de Cita a Oscar",
+        btnSending: "⏳ Transmitiendo a Oscar...",
+        statusConnecting: "Conectando con el sistema de Oscar...",
+        valRequired: "Por favor completa la Dirección y el Teléfono de Contacto.",
+        successTitle: "¡Solicitud Enviada!",
+        successMsg: "Tu cita ha sido transmitida directamente a la computadora de <strong>HVAC By Oscar</strong>. Te contactaremos pronto para confirmar.",
+        successClose: "Entendido",
+        errorTitle: "Aviso de Conexión",
+        errorClose: "Cerrar"
+      }
+    };
 
-    // Read URL params (pre-filled from QR sticker)
+    let currentLang = 'en';
+    let selectedDateIdx = 0;
+    let selectedSvcIdx = 0;
+
+    // Detect initial language: URL param ?lang=es / localStorage / browser
     const p = new URLSearchParams(location.search);
+    if (p.get('lang') === 'es' || p.get('lang') === 'en') {
+      currentLang = p.get('lang');
+    } else if (localStorage.getItem('hvac_lang')) {
+      currentLang = localStorage.getItem('hvac_lang');
+    } else if (navigator.language && navigator.language.startsWith('es')) {
+      currentLang = 'es';
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem('hvac_lang', lang);
+      document.getElementById('btnLangEn').classList.toggle('active', lang === 'en');
+      document.getElementById('btnLangEs').classList.toggle('active', lang === 'es');
+      applyLanguage();
+    }
+
+    function applyLanguage() {
+      const t = i18n[currentLang];
+      document.title = t.pageTitle;
+      document.getElementById('txtTitle').textContent = t.title;
+      document.getElementById('txtSubtitle').textContent = t.subtitle;
+      document.getElementById('txtSecLocation').textContent = t.secLocation;
+      document.getElementById('autoBadge').textContent = t.autoBadge;
+      document.getElementById('lblAddress').textContent = t.lblAddress;
+      document.getElementById('addressInput').placeholder = t.phAddress;
+      document.getElementById('lblApt').textContent = t.lblApt;
+      document.getElementById('aptInput').placeholder = t.phApt;
+      document.getElementById('lblPhone').textContent = t.lblPhone;
+      document.getElementById('phoneInput').placeholder = t.phPhone;
+      document.getElementById('lblName').textContent = t.lblName;
+      document.getElementById('nameInput').placeholder = t.phName;
+      document.getElementById('lblEquipment').textContent = t.lblEquipment;
+      document.getElementById('txtSecWhen').textContent = t.secWhen;
+      
+      document.getElementById('lblDay0').textContent = t.days[0];
+      document.getElementById('lblDay1').textContent = t.days[1];
+      document.getElementById('lblDay2').textContent = t.days[2];
+
+      document.getElementById('lblTimeSlot').textContent = t.lblTimeSlot;
+      document.getElementById('optSlotMorning').textContent = t.slots[0];
+      document.getElementById('optSlotAfternoon').textContent = t.slots[1];
+      document.getElementById('optSlotEmergency').textContent = t.slots[2];
+
+      document.getElementById('txtSecProblem').textContent = t.secProblem;
+      document.getElementById('svc0').textContent = t.services[0];
+      document.getElementById('svc1').textContent = t.services[1];
+      document.getElementById('svc2').textContent = t.services[2];
+      document.getElementById('svc3').textContent = t.services[3];
+
+      document.getElementById('lblNotes').textContent = t.lblNotes;
+      document.getElementById('notesInput').placeholder = t.phNotes;
+
+      document.getElementById('btnSubmit').textContent = t.btnSubmit;
+      document.getElementById('txtSuccessTitle').textContent = t.successTitle;
+      document.getElementById('txtSuccessMsg').innerHTML = t.successMsg;
+      document.getElementById('btnSuccessClose').textContent = t.successClose;
+      document.getElementById('txtErrorTitle').textContent = t.errorTitle;
+      document.getElementById('btnErrorClose').textContent = t.errorClose;
+    }
+
+    // Prefill URL parameters from QR Code
     const binId = p.get('bin') || '';
     if (p.get('name')) document.getElementById('nameInput').value = p.get('name');
     if (p.get('address')) document.getElementById('addressInput').value = p.get('address');
@@ -155,41 +316,44 @@
       document.getElementById('autoBadge').style.display = 'block';
     }
 
-    // Fill date buttons
+    // Fill date numbers
     for (let i = 0; i < 3; i++) {
       const d = new Date(); d.setDate(d.getDate() + i);
       document.getElementById('d' + i).innerText = d.getDate() + '/' + (d.getMonth() + 1);
     }
 
-    function pickDate(el, txt) {
-      document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('active'));
-      el.classList.add('active'); selDate = txt;
+    function pickDate(idx) {
+      selectedDateIdx = idx;
+      document.querySelectorAll('.date-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
     }
-    function pickSvc(el, txt) {
-      document.querySelectorAll('.service-card').forEach(s => s.classList.remove('active'));
-      el.classList.add('active'); selSvc = txt;
+
+    function pickSvc(idx) {
+      selectedSvcIdx = idx;
+      document.querySelectorAll('.service-card').forEach((s, i) => s.classList.toggle('active', i === idx));
     }
 
     async function sendBooking() {
+      const t = i18n[currentLang];
       const address = document.getElementById('addressInput').value.trim();
       const phone = document.getElementById('phoneInput').value.trim();
-      if (!address || !phone) { alert('Dirección y Teléfono son requeridos.'); return; }
-      if (!binId) {
-        document.getElementById('errorMsg').textContent = 'Este QR no tiene un canal de transmisión configurado. Contacta a Oscar directamente.';
-        document.getElementById('errorModal').style.display = 'flex';
+      if (!address || !phone) {
+        alert(t.valRequired);
         return;
       }
 
       const btn = document.getElementById('btnSubmit');
-      btn.innerText = '⏳ Enviando...'; btn.disabled = true;
-      document.getElementById('statusMsg').textContent = 'Conectando con el sistema de Oscar...';
+      btn.innerText = t.btnSending;
+      btn.disabled = true;
+      document.getElementById('statusMsg').textContent = t.statusConnecting;
 
       const apt = document.getElementById('aptInput').value.trim();
-      const name = document.getElementById('nameInput').value.trim() || 'Cliente QR';
+      const name = document.getElementById('nameInput').value.trim() || 'Client (QR)';
       const equipment = document.getElementById('equipmentInput').value.trim();
       const notes = document.getElementById('notesInput').value.trim();
       const timeSlot = document.getElementById('timeSlotInput').value;
       const fullAddr = apt ? address + ', ' + apt : address;
+      const dateText = i18n[currentLang].days[selectedDateIdx] + ' (' + document.getElementById('d' + selectedDateIdx).innerText + ')';
+      const svcText = i18n[currentLang].services[selectedSvcIdx];
 
       const newBooking = {
         id: Date.now(),
@@ -198,47 +362,46 @@
         phone: phone,
         aptNumber: apt,
         equipment: equipment,
-        problem: selSvc + (notes ? ' - ' + notes : ''),
-        requestedDate: selDate,
+        problem: svcText + (notes ? ' - ' + notes : ''),
+        requestedDate: dateText,
         timeSlot: timeSlot,
+        language: currentLang,
         timestamp: new Date().toISOString(),
         isAccepted: false
       };
 
       try {
-        // Step 1: GET current cloud data
-        const endpoint = 'https://jsonblob.com/api/jsonBlob/' + binId;
-        const getResp = await fetch(endpoint, {
-          headers: { 'Accept': 'application/json' }
+        const cleanBin = binId ? binId.replace(/[^a-zA-Z0-9_-]/g, '') : '';
+        const topic = cleanBin ? ('hvac_oscar_' + cleanBin) : 'hvac_by_oscar_citas';
+        const endpoint = 'https://ntfy.sh/' + topic;
+
+        const postResp = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Title': 'New Appointment: ' + name + ' (' + svcText + ')',
+            'Priority': 'high',
+            'Tags': 'snowflake,calendar'
+          },
+          body: JSON.stringify(newBooking)
         });
 
-        if (!getResp.ok) throw new Error('Server response: ' + getResp.status);
-        const cloudData = await getResp.json();
-
-        // Step 2: Append booking to qr_bookings array
-        if (!cloudData.qr_bookings) cloudData.qr_bookings = [];
-        cloudData.qr_bookings.push(newBooking);
-
-        // Step 3: PUT updated data back
-        const putResp = await fetch(endpoint, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify(cloudData)
-        });
-
-        if (!putResp.ok) throw new Error('PUT failed: ' + putResp.status);
+        if (!postResp.ok) throw new Error('HTTP ' + postResp.status);
 
         // Success!
         document.getElementById('statusMsg').textContent = '';
         document.getElementById('successModal').style.display = 'flex';
       } catch (err) {
         console.error('Booking error:', err);
-        document.getElementById('errorMsg').textContent = 'Error: ' + err.message + '. Puedes llamar directamente al número del sticker.';
+        document.getElementById('errorMsg').textContent = 'Error: ' + err.message;
         document.getElementById('errorModal').style.display = 'flex';
-        btn.innerText = '📲 Reintentar Envío'; btn.disabled = false;
+        btn.innerText = t.btnSubmit;
+        btn.disabled = false;
         document.getElementById('statusMsg').textContent = '';
       }
     }
+
+    // Initialize Language
+    setLanguage(currentLang);
   </script>
 </body>
 </html>
